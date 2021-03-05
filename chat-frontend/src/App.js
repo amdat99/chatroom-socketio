@@ -8,13 +8,15 @@ let socket
 
 function App() {
   const [createRoom, setCreateRoom] = useState('')
-  const [rooms, setRooms] = useState(['1','2','3']);
+  const [rooms, setRooms] = useState([]);
   const [room, setRoom] = useState(rooms[0]);
   const [message, setMessage] = useState('');
   const [chat, setChat] = useState([]);
   
   useEffect(() => {
+     fetchRooms()
     if (room) initiateSocket(room);
+   
     enterChat((err, data) => {
       if(err) return;
       setChat(existingdata =>[data, ...existingdata])
@@ -24,6 +26,33 @@ function App() {
     }
   }, [room]
   )
+
+  
+
+const  fetchRooms =() =>{
+  fetch('http://localhost:8000/fetchrooms',{
+  method: 'post',
+  headers: {'Content-Type': 'application/json'},
+  })
+  .then(res => res.json())
+  .then(data=> {
+      setRooms(data)
+  })
+}
+
+
+const  sendRoom = async() =>{
+  fetch('http://localhost:8000/addroom',{
+  method: 'post',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({
+    room: createRoom ,
+    })
+})
+fetchRooms() 
+refreshPage()
+}
+  
   
 
   
@@ -57,20 +86,22 @@ function App() {
 
   const addRoom = () => {
     if(createRoom){
-    setRooms([...rooms,createRoom])
-    setCreateRoom('')
-    initiateSocket(room)
+    sendRoom()
+    setCreateRoom()
     }
   }
 
-console.log(rooms)
+  function refreshPage() {
+    window.location.reload(false);
+  }
+console.log(chat)
   
 
   return (
     <div>
       <div>{room}</div>
       { rooms.map((room, i) =>
-       <button onClick={() => setRoom(room) } key={i}>{room}</button>)}
+       <button onClick={() => {setRoom(room);  }} key={i}>{room}</button>)}
 
      <input type ='text' onChange={getRoomInput} placeholder="create room"/>
       <button onClick={addRoom}>create room</button> 
