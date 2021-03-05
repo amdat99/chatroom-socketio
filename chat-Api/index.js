@@ -11,25 +11,24 @@ const server = app.listen(webSocketsServerPort,function()
 const io = socket(server)
 app.use(cors())
 
-io.on('connection', (socket) => {
-    console.log(`user connected ${socket.id}`);
-    
-    socket.on('disconnect', () =>
-       console.log(`disconnected ${socket.id}`));
-    
-    socket.on('enter chat', (room) => {
-       console.log(` user ${socket.id} entered ${room}`);
-       socket.join(room);
-    });
-    
-    socket.on('chat', (data) => {
-       const { message, room } = data;
-       console.log(`message: ${message}, room: ${room}`);
-       io.to(room).emit('chat', message);
-    });
- });
 
 
 
+ io.on('connection', (socket) => {
+   console.log(`Connected ${socket.id}`);
+   
+   socket.on('disconnect', () =>
+      console.log(`Disconnected ${socket.id}`));
+   
+      socket.on('join', (room) => {
+      console.log(` ${socket.id} joined ${room}`);
+      socket.join(room);
+   });
+   socket.on('chat', (data) => {
+      const { message, room } = data;
+      console.log(`message: ${message}, room: ${room}`);
+      io.to(room).emit('chat', message);
+   });
+});
 
 
