@@ -17,7 +17,7 @@ function App() {
     if (room) initiateSocket(room);
     enterChat((err, data) => {
       if(err) return;
-      setChat(oldChats =>[data, ...oldChats])
+      setChat(existingdata =>[data, ...existingdata])
     });
     return () => {
       disconnectSocket();
@@ -38,9 +38,9 @@ function App() {
   }
    const enterChat = (data) => {
     if (!socket) return;
-    socket.on('chat', msg => {
+    socket.on('chat', message => {
       console.log('message reieved');
-      return data(null, msg);
+      return data(null, message);
     });
   }
    const sendMessage = (room, message) => {
